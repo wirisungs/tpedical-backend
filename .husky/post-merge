@@ -1,0 +1,9 @@
+echo '#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+if [ "$(git rev-parse --abbrev-ref HEAD)" = "master" ]; then
+  echo "Merging master changes into develop..."
+  git checkout develop
+  git merge master
+  git push origin develop
+fi' > .husky/post-merge
