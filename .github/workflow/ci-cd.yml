@@ -3,10 +3,10 @@ name: CI/CD for NestJS
 on:
   push:
     branches:
-      - main # Chạy khi push vào nhánh chính
+      - master # Chạy khi push vào nhánh chính
   pull_request:
     branches:
-      - main # Chạy khi có pull request vào nhánh chính
+      - master # Chạy khi có pull request vào nhánh chính
 
 jobs:
   build:
