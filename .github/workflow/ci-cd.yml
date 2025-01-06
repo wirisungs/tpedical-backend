@@ -1,36 +1,72 @@
-name: CI/CD Pipeline
+name: CI/CD for NestJS
 
 on:
   push:
     branches:
-      - main
+      - main # Chạy khi push vào nhánh chính
   pull_request:
     branches:
-      - main
+      - main # Chạy khi có pull request vào nhánh chính
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 18 # Phiên bản Node.js phù hợp
 
+      # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
+      # Run lint
+      - name: Run Lint
+        run: npm run lint
+
+      # Run tests
+      - name: Run Tests
         run: npm run test
 
-      - name: Build application
+      # Build project
+      - name: Build Project
         run: npm run build
 
-      - name: Deploy to Production
-        run: |
-          # Thêm lệnh triển khai của bạn ở đây
-          echo "Đang triển khai ứng dụng..."
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install --production
+
+      # Deploy to server (sử dụng SSH)
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USER }}
+          key: ${{ secrets.DEPLOY_SERVER_KEY }}
+          script: |
+            cd /path/to/your/project
+            git pull origin main
+            npm install --production
+            pm2 restart all
