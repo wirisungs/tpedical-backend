@@ -34,39 +34,3 @@ jobs:
         run: |
           # Lệnh triển khai lên môi trường Development
           # Ví dụ: ssh user@dev-server 'bash -s' < deploy.sh
-name: CI/CD for Development
-
-on:
-  push:
-    branches:
-      - develop
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Lint code
-        run: npm run lint
-
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Build application
-        run: npm run build
-
-      - name: Deploy to Development
-        run: |
-          # Lệnh triển khai lên môi trường Development
-          # Ví dụ: ssh user@dev-server 'bash -s' < deploy.sh
