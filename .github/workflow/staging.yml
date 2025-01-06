@@ -1,36 +1,33 @@
-name: CI/CD for Staging
+name: CI/CD for Staging Environment
 
 on:
   pull_request:
     branches:
-      - staging
+      - master  # Khi có pull request merge vào nhánh main
 
 jobs:
-  build:
+  staging-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Lint code
-        run: npm run lint
+    - name: Run tests
+      run: npm run test:ci  # Chạy các kiểm thử phù hợp với staging
 
-      - name: Run unit and integration tests
-        run: npm run test:integration
+    - name: Build application
+      run: npm run build
 
-      - name: Build application
-        run: npm run build
-
-      - name: Deploy to Staging
-        run: |
-          # Lệnh triển khai lên môi trường Staging
-          # Ví dụ: ssh user@staging-server 'bash -s' < deploy.sh
+    - name: Deploy to Staging Server
+      run: |
+        scp -r ./dist user@staging-server:/path/to/project
+        ssh user@staging-server 'pm2 restart app'

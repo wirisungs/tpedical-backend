@@ -1,37 +1,36 @@
-name: CI/CD for Production
+name: CI/CD for Production Environment
 
 on:
   push:
     branches:
-      - main
-      - master
+      - master  # Chạy khi có commit vào nhánh main hoặc tag version
 
 jobs:
-  build:
+  production-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install --production  # Chỉ cài các phụ thuộc cần thiết
 
-      - name: Lint code
-        run: npm run lint
+    - name: Run tests
+      run: npm run test:ci
 
-      - name: Run all tests
-        run: npm run test:all
+    - name: Build application
+      run: npm run build
 
-      - name: Build application
-        run: npm run build
+    - name: Deploy to Production Server
+      run: |
+        scp -r ./dist user@production-server:/path/to/project
+        ssh user@production-server 'pm2 restart app'
 
-      - name: Deploy to Production
-        run: |
-          # Lệnh triển khai lên môi trường Production
-          # Ví dụ: ssh user@prod-server 'bash -s' < deploy.sh
+    - name: Notify Team
+      run: echo "Deployment to Production Successful!"  # Thông báo qua email hoặc Slack

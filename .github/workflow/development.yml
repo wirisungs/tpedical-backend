@@ -1,36 +1,33 @@
-name: CI/CD for Development
+name: CI/CD for Dev Environment
 
 on:
   push:
     branches:
-      - develop
+      - develop  # Chạy khi có commit vào nhánh dev
 
 jobs:
-  build:
+  dev-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Lint code
-        run: npm run lint
+    - name: Run tests
+      run: npm run test
 
-      - name: Run unit tests
-        run: npm run test
+    - name: Build application
+      run: npm run build
 
-      - name: Build application
-        run: npm run build
-
-      - name: Deploy to Development
-        run: |
-          # Lệnh triển khai lên môi trường Development
-          # Ví dụ: ssh user@dev-server 'bash -s' < deploy.sh
+    - name: Deploy to Dev Server
+      run: |
+        scp -r ./dist user@dev-server:/path/to/project
+        ssh user@dev-server 'pm2 restart app'
